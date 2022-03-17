@@ -5235,8 +5235,26 @@ int perturb_initial_conditions(struct precision * ppr,
       ppw->pv->y[ppw->pv->index_pt_theta_b] = ppw->pv->y[ppw->pv->index_pt_theta_g]; /* baryon velocity */
 
       if (pba->has_cdm == _TRUE_) {
+      /* BEGIN MODIFICATION RL   */
+        if(pba->has_iDMDE == _TRUE_){
+             if(pba->iDMDE_pert_type == DiValentino){ppw->pv->y[ppw->pv->index_pt_delta_cdm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* cdm density */
+        /* cdm velocity vanishes in the synchronous gauge */
+          	}
+             else if(pba->iDMDE_pert_type == He){ppw->pv->y[ppw->pv->index_pt_delta_cdm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* cdm density */
+        /* cdm velocity vanishes in the synchronous gauge */
+        }   
+             else if(pba->iDMDE_pert_type == DEDM){ppw->pv->y[ppw->pv->index_pt_delta_cdm] = 3./4.*(1.-pba->delta_Q/3.-pow(pba->delta_Q,2)/3.
+            			*1./(-w_fld/2.-pba->delta_Q/3.+1./2.*pow(w_fld*(4./3.*pba->delta_Q+w_fld),0.5)))*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* cdm density */
+        /* cdm velocity vanishes in the synchronous gauge */
+        }  
+             else if(pba->iDMDE_pert_type == IntDM){ppw->pv->y[ppw->pv->index_pt_delta_cdm] = 3./4.*(1.-pba->delta_Q/3.)*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* cdm density */
+        /* cdm velocity vanishes in the synchronous gauge */
+          	}  	
+          }
+        else{
         ppw->pv->y[ppw->pv->index_pt_delta_cdm] = 3./4.*ppw->pv->y[ppw->pv->index_pt_delta_g]; /* cdm density */
         /* cdm velocity vanishes in the synchronous gauge */
+        }
       }
 
       /* interacting dark matter */
@@ -5258,21 +5276,34 @@ int perturb_initial_conditions(struct precision * ppr,
 
         if (pba->use_ppf == _FALSE_) {
 
-          /* BEGIN MODIFICATION ML */
+          /* BEGIN MODIFICATION ML & RL*/
           if(pba->has_iDMDE == _TRUE_){
-            ppw->pv->y[ppw->pv->index_pt_delta_fld] = (1+w_fld-pba->delta_Q*2.)
+             if(pba->iDMDE_pert_type == DiValentino){ppw->pv->y[ppw->pv->index_pt_delta_fld] = (1+w_fld-pba->delta_Q*2.)
                                                       *(1+w_fld+pba->delta_Q/3.)
                                                       /(12*w_fld*w_fld-2*w_fld-3*w_fld*pba->delta_Q+7*pba->delta_Q-14)
                                                       *(-2.*ppw->pv->y[ppw->pv->index_pt_delta_g]/(1+1./3.));
             ppw->pv->y[ppw->pv->index_pt_theta_fld] = k*tau*(1+w_fld+pba->delta_Q/3.)
                                                       /(12*w_fld*w_fld-2*w_fld-3*w_fld*pba->delta_Q+7*pba->delta_Q-14)
                                                       *(-2.*ppw->pv->y[ppw->pv->index_pt_delta_g]/(1+1./3.));
+          	}
+             else if(pba->iDMDE_pert_type == He){ppw->pv->y[ppw->pv->index_pt_delta_fld] = (1+w_fld+pba->delta_Q/3.)
+                                                      *(ppw->pv->y[ppw->pv->index_pt_delta_g]/(1+1./3.));
+            ppw->pv->y[ppw->pv->index_pt_theta_fld] = ppw->pv->y[ppw->pv->index_pt_theta_g];
+          	}   
+            else if(pba->iDMDE_pert_type == DEDM){ppw->pv->y[ppw->pv->index_pt_delta_fld] = (1+w_fld/2.+1./2.*pow(w_fld*(4./3.*pba->delta_Q+w_fld),0.5))
+                                                      *(ppw->pv->y[ppw->pv->index_pt_delta_g]/(1+1./3.));
+            ppw->pv->y[ppw->pv->index_pt_theta_fld] = ppw->pv->y[ppw->pv->index_pt_theta_g];
+          	}  
+             else if(pba->iDMDE_pert_type == IntDM){ppw->pv->y[ppw->pv->index_pt_delta_fld] = (1-pba->delta_Q/3.)
+                                                      *(ppw->pv->y[ppw->pv->index_pt_delta_g]/(1+1./3.));
+            ppw->pv->y[ppw->pv->index_pt_theta_fld] = ppw->pv->y[ppw->pv->index_pt_theta_g];
+          	}  	
           }
           else{
             ppw->pv->y[ppw->pv->index_pt_delta_fld] = - ktau_two/4.*(1.+w_fld)*(4.-3.*pba->cs2_fld)/(4.-6.*w_fld+3.*pba->cs2_fld) * ppr->curvature_ini * s2_squared; /* from 1004.5509 */ //TBC: curvature
             ppw->pv->y[ppw->pv->index_pt_theta_fld] = - k*ktau_three/4.*pba->cs2_fld/(4.-6.*w_fld+3.*pba->cs2_fld) * ppr->curvature_ini * s2_squared; /* from 1004.5509 */ //TBC:curvature
           }
-          /* END MODIFICATION ML */
+          /* END MODIFICATION ML & RL*/
 
         }
         /* if use_ppf == _TRUE_, y[ppw->pv->index_pt_Gamma_fld] will be automatically set to zero, and this is what we want (although one could probably work out some small nonzero initial conditions: TODO) */
@@ -8748,7 +8779,7 @@ int perturb_derivs(double tau,
                                                 a_prime_over_a*(y[pv->index_pt_delta_fld]-y[pv->index_pt_delta_cdm])
                                                 +metric_continuity/3.
                                                 );
-          }
+          } /* BEGIN MODIFICATION RL added  +metric_continuity/3 +k vt/3. in the last line */ 
           else if(pba->iDMDE_pert_type == He){
             // Here we use the equations as they are given in
             //        Eq. (12) of He et al. 2011,
@@ -8758,8 +8789,52 @@ int perturb_derivs(double tau,
                                          -metric_continuity
                                          +pba->delta_Q*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_cdm]*(
                                                 a_prime_over_a*(y[pv->index_pt_delta_fld]-y[pv->index_pt_delta_cdm])
+                                                 +metric_continuity/3. 
+                                                 + ((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.
                                                 );
           }
+           else if(pba->iDMDE_pert_type == DEDM){
+            // Here we use the equations as they are given in
+            //        Eq. (12) of He et al. 2011,
+              //      Eq. (12) of Costa et al. 2014 (delta_Q = 3xi_1, delta_Q =3xi_2)
+            //        Eq. (2.2a) of Murgia et al. 2016
+            dy[pv->index_pt_delta_cdm] = -y[pv->index_pt_theta_cdm]
+                                         -metric_continuity
+                                         +pba->delta_Q*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_cdm]*(
+                                                a_prime_over_a*(y[pv->index_pt_delta_fld]-y[pv->index_pt_delta_cdm]))
+                                                 +(pba->delta_Q +pba->delta_Q*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_cdm])*
+                                                 (metric_continuity/3
+                                                 +((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.)
+                                         ;
+          }        
+         else if(pba->iDMDE_pert_type == IntDM){
+            // Here we use the equations as they are given in
+            //        Eq. (12) of He et al. 2011,
+              //      Eq. (12) of Costa et al. 2014 (delta_Q = 3xi_1, xi_2=0)
+            //        Eq. (2.2a) of Murgia et al. 2016
+            dy[pv->index_pt_delta_cdm] = -y[pv->index_pt_theta_cdm]
+                                         -metric_continuity
+                                         +pba->delta_Q*(metric_continuity/3.
+                                            +((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.)
+                                         ;
+          }  
+          
+          /* END MODIFICATION RL */ 
         }
         else{
           dy[pv->index_pt_delta_cdm] = -metric_continuity;
@@ -8783,6 +8858,27 @@ int perturb_derivs(double tau,
                                               +pba->delta_Q*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_cdm]
                                               );
           }
+           /* BEGIN MODIFICATION RL */
+          else if(pba->iDMDE_pert_type == DEDM){
+            // Here we use the equations as they are given in
+            //        Eq. (14) of Costa et al. 2014 (delta_Q= 3xi_1, delta_Q=3xi_2)
+            //        Eq. (2.2b) of Murgia et al. 2016
+            dy[pv->index_pt_theta_cdm] = - a_prime_over_a*y[pv->index_pt_theta_cdm]*(
+                                              1.
+                                              +pba->delta_Q*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_cdm]
+                                              +pba->delta_Q
+                                              );
+          }
+          else if(pba->iDMDE_pert_type == IntDM){
+            // Here we use the equations as they are given in
+            //        Eq. (14) of Costa et al. 2014 (delta_Q= 3xi_1, xi_2=0)
+            //        Eq. (2.2b) of Murgia et al. 2016
+            dy[pv->index_pt_theta_cdm] = - a_prime_over_a*y[pv->index_pt_theta_cdm]*(
+                                              1.
+                                              +pba->delta_Q
+                                              );
+          }
+            /* END MODIFICATION RL */
         }
         else{
           dy[pv->index_pt_theta_cdm] = 0.;
@@ -8925,8 +9021,64 @@ int perturb_derivs(double tau,
                                                                 3.*(1.+w_fld)
                                                                 +pba->delta_Q
                                                                 )
-                                                  );
+                                                  )       
+                                       -(pba->delta_Q)*(metric_continuity/3.
+                                           +((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.);
           }
+          
+          /* BEGIN MODIFICATION RL added -(pba->delta_Q)*(metric_continuity/3 +k vt/3). in the line above*/
+          else if(pba->iDMDE_pert_type == DEDM){
+            // Here we use the equations as they are given in
+            //        Eq. (13) of Costa et al. 2014 (delta_Q1=3xi_1, delta_Q=3xi_2)
+            //        Eq. (2.2c) of Murgia et al. 2016 (typo in last term)
+            dy[pv->index_pt_delta_fld] = -(1+w_fld)*(y[pv->index_pt_theta_fld]+metric_continuity)
+                                         -3.*a_prime_over_a*(1.-w_fld)*(
+                                                  y[pv->index_pt_delta_fld]
+                                                  +a_prime_over_a*y[pv->index_pt_theta_fld]/k2*(
+                                                                3.*(1.+w_fld)
+                                                                +pba->delta_Q
+                                                                +pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld]
+                                                                )
+                                                  )
+                                        +a_prime_over_a*pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld]*(y[pv->index_pt_delta_fld]
+                                        			-y[pv->index_pt_delta_cdm])          
+                                       -(pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld] + pba->delta_Q)*(metric_continuity/3.
+                                       	     +((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.);
+          }
+          else if(pba->iDMDE_pert_type == IntDM){
+            // Here we use the equations as they are given in
+            //        Eq. (13) of Costa et al. 2014 (delta_Q=3xi_1, xi_2=0)
+            //        Eq. (2.2c) of Murgia et al. 2016 (typo in last term)
+            dy[pv->index_pt_delta_fld] = -(1+w_fld)*(y[pv->index_pt_theta_fld]+metric_continuity)
+                                         -3.*a_prime_over_a*(1.-w_fld)*(
+                                                  y[pv->index_pt_delta_fld]
+                                                  +a_prime_over_a*y[pv->index_pt_theta_fld]/k2*(
+                                                                3.*(1.+w_fld)
+                                                                +pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld]
+                                                                )
+                                                  )
+                                        +a_prime_over_a*pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld]*(y[pv->index_pt_delta_fld]
+                                        			-y[pv->index_pt_delta_cdm])          
+                                       -(pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])*(metric_continuity/3.
+                                       	      +((
+                                               (1.+1./3.)*pvecback[pba->index_bg_rho_g]/pvecback[pba->index_bg_rho_tot]*theta_g
+                                                 +(1.+w_fld)*pvecback[pba->index_bg_rho_fld]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_fld]
+                                                +pvecback[pba->index_bg_rho_b]/pvecback[pba->index_bg_rho_tot]*y[pv->index_pt_theta_b]
+                                                )/(1.+1./3.+w_fld)
+                                                 )/3.);
+          }
+          /* END MODIFICATION RL */
+          /* END MODIFICATION ML */
         }
         else{
           dy[pv->index_pt_delta_fld] =
@@ -8934,6 +9086,7 @@ int perturb_derivs(double tau,
             -3.*(cs2-w_fld)*a_prime_over_a*y[pv->index_pt_delta_fld]
             -9.*(1+w_fld)*(cs2-ca2)*a_prime_over_a*a_prime_over_a*y[pv->index_pt_theta_fld]/k2;
         }
+        
 
         /** - ----> fluid velocity */
         // For theta_DE:
@@ -8958,16 +9111,39 @@ int perturb_derivs(double tau,
                                                 )
                                         +k2/(1.+w_fld)*y[pv->index_pt_delta_fld];
           }
-        }
+      /* BEGIN MODIFICATION RL */     
+          else if(pba->iDMDE_pert_type == DEDM){
+            // Here we use the equations as they are given in
+            //        Eq. (15) of Costa et al. 2014 (delta_Q1=3xi_1, delta_Q=3xi_2)
+            //        Eq. (2.2d) of Murgia et al. 2016 (typo in first term)
+            dy[pv->index_pt_theta_fld] = 2*a_prime_over_a*y[pv->index_pt_theta_fld]*(
+                                                1.
+                                                +pba->delta_Q/(1+w_fld)
+                                                +pba->delta_Q*(pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])/(1+w_fld)
+                                                )
+                                        +k2/(1.+w_fld)*y[pv->index_pt_delta_fld];
+          }
+          else if(pba->iDMDE_pert_type == IntDM){
+            // Here we use the equations as they are given in
+            //        Eq. (15) of Costa et al. 2014 (delta_Q1=3xi_1, xi_2=0)
+            //        Eq. (2.2d) of Murgia et al. 2016 (typo in first term)
+            dy[pv->index_pt_theta_fld] = 2*a_prime_over_a*y[pv->index_pt_theta_fld]*(
+                                                1.
+                                                +pba->delta_Q*(pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])/(1+w_fld)
+                                                )
+                                        +k2/(1.+w_fld)*y[pv->index_pt_delta_fld];
+          }
+         }
+         /* END MODIFICATION RL */  
         else{
           dy[pv->index_pt_theta_fld] =
             -(1.-3.*cs2)*a_prime_over_a*y[pv->index_pt_theta_fld]
             +cs2*k2/(1.+w_fld)*y[pv->index_pt_delta_fld]
             +metric_euler;
-         }
         /* END MODIFICATION ML */
-
+         }
       }
+      
       else {
         dy[pv->index_pt_Gamma_fld] = ppw->Gamma_prime_fld; /* Gamma variable of PPF formalism */
       }

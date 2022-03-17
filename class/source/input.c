@@ -1570,7 +1570,7 @@ int input_read_parameters(
 
   class_read_double("decay",pth->decay);
 
-  /* BEGIN MODIFICATION ML */
+  /* BEGIN MODIFICATION ML RL */
   /** Iteracting DE-DM */
   class_read_double("delta_Q",pba->delta_Q);
   if(pba->delta_Q != 0){
@@ -1584,12 +1584,18 @@ int input_read_parameters(
       else if ((strstr(string1,"DiValentino") != NULL)) {
         pba->iDMDE_pert_type = DiValentino;
       }
+      else if ((strstr(string1,"IntDM") != NULL)) {
+        pba->iDMDE_pert_type = IntDM;
+      }
+      else if ((strstr(string1,"DEDM") != NULL)) {
+        pba->iDMDE_pert_type = DEDM;
+      }
       else {
         class_stop(errmsg,"incomprehensible input '%s' for the field 'iDMDE_pert_type'",string1);
       }
     }
   }
-  /* END MODIFICATION ML */
+  /* END MODIFICATION ML RL*/
 
   class_call(parser_read_string(pfc,
                                 "compute damping scale",

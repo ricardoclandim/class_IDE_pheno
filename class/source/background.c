@@ -317,11 +317,35 @@ int background_functions(
 
     /* BEGIN MODIFICATION ML */
     if(pba->has_iDMDE == _TRUE_){
+    /* BEGIN MODIFICATION RL*/
       // From Eq. (33) of Gavela et al. 2009
+      if(pba->iDMDE_pert_type == DiValentino){
       double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
       double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
       double w_fld_eff = pba->w0_fld+pba->delta_Q/3.;
       pvecback[pba->index_bg_rho_cdm] = rho_dm0*pow(a_rel,-3.)+rho_de0*pba->delta_Q/(3.*w_fld_eff)*(1.-pow(a_rel,-3.*w_fld_eff))*pow(a_rel,-3.);
+    	}
+     else if(pba->iDMDE_pert_type == He){
+      double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
+      double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
+      double w_fld_eff = pba->w0_fld+pba->delta_Q/3.;
+      pvecback[pba->index_bg_rho_cdm] = rho_dm0*pow(a_rel,-3.)+rho_de0*pba->delta_Q/(3.*w_fld_eff)*(1.-pow(a_rel,-3.*w_fld_eff))*pow(a_rel,-3.);
+   	 } 
+     else if(pba->iDMDE_pert_type == DEDM){
+     /* From Eq. (2) of Olivares et al. 2005 Observational constraints on interacting quintessence models */
+      double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
+      double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
+      double w_fld_eff = pow(pow(pba->w0_fld,2.)+ (4./3.)*pba->w0_fld*pba->delta_Q,0.5);
+      double s_p = -3.*(1.+pba->w0_fld/2.)- (3./2.)*w_fld_eff;
+      double s_m = -3.*(1.+pba->w0_fld/2.)+ (3./2.)*w_fld_eff;
+      pvecback[pba->index_bg_rho_cdm] = (1./w_fld_eff)*(((1.+pba->w0_fld+ pba->delta_Q/3.)*rho_dm0+pba->delta_Q/3.*rho_de0)
+      				*(pow(a_rel,s_m)-pow(a_rel,s_p ))+ rho_dm0*(s_m*pow(a_rel,s_m)-s_p*pow(a_rel,s_p)/3.));
+    }
+    else if(pba->iDMDE_pert_type == IntDM){
+      double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
+      double w_fld_eff = -pba->delta_Q/3.;
+      pvecback[pba->index_bg_rho_cdm] = rho_dm0*pow(a_rel,-3.*(1. + w_fld_eff));
+    }
     }
     else{
       pvecback[pba->index_bg_rho_cdm] = pba->Omega0_cdm * pow(pba->H0,2) / pow(a_rel,3);
@@ -425,10 +449,35 @@ int background_functions(
 
     /* BEGIN MODIFICATION ML */
     if(pba->has_iDMDE == _TRUE_){
+      if(pba->iDMDE_pert_type == DiValentino){
       // From Eq. (33) of Gavela et al. 2009
       double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
       double w_fld_eff = pba->w0_fld+pba->delta_Q/3.;
       pvecback[pba->index_bg_rho_fld] = rho_de0*pow(a_rel,-3.*(1.+w_fld_eff));
+    }
+      else if(pba->iDMDE_pert_type == He){
+      // From Eq. (33) of Gavela et al. 2009
+      double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
+      double w_fld_eff = pba->w0_fld+pba->delta_Q/3.;
+      pvecback[pba->index_bg_rho_fld] = rho_de0*pow(a_rel,-3.*(1.+w_fld_eff));
+    }
+      else if(pba->iDMDE_pert_type == DEDM){
+      // From Eq. (2) of Olivares et al. 2005 Observational constraints on interacting quintessence models
+      double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
+      double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
+      double w_fld_eff = pow(pow(pba->w0_fld,2)+ (4./3.)*pba->w0_fld*pba->delta_Q,0.5);
+      double s_p = -3.*(1.+pba->w0_fld/2.)- (3./2.)*w_fld_eff;
+      double s_m = -3.*(1.+pba->w0_fld/2.)+ (3./2.)*w_fld_eff;
+      pvecback[pba->index_bg_rho_fld] = (1./w_fld_eff)*((pba->delta_Q/3.*rho_dm0-(1.-pba->delta_Q/3.)*rho_de0)*(pow(a_rel,s_p)-pow(a_rel,s_m ))
+      					+ rho_de0*(s_m*pow(a_rel,s_m)-s_p*pow(a_rel,s_p)/3.));
+     }
+      else if(pba->iDMDE_pert_type == IntDM){
+      double rho_dm0 = pba->Omega0_cdm*pow(pba->H0,2.);
+      double rho_de0 = pba->Omega0_fld*pow(pba->H0,2.);
+      double w_fld_eff = -pba->delta_Q/3.;
+      pvecback[pba->index_bg_rho_fld] = rho_de0*pow(a_rel,-3.*(1. + pba->w0_fld))+rho_dm0*pba->delta_Q/(3.*(pba->w0_fld - w_fld_eff))
+      				*(1.-pow(a_rel,-3.*(w_fld_eff -  pba->w0_fld)))*pow(a_rel,-3.*(1. + pba->w0_fld));
+     }
     }
     else{
       /* get rho_fld from vector of integrated variables */
