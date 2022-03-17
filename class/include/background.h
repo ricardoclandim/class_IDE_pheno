@@ -22,9 +22,14 @@ enum spatial_curvature {flat,open,closed};
 
 enum equation_of_state {CLP,EDE};
 
-/* BEGIN MODIFICATION ML */
-enum pert_type {He,DiValentino};
-/* END MODIFICATION ML */
+/*/* BEGIN MODIFICATION ML  */
+/* enum pert_type {He,DiValentino};
+/* /* END MODIFICATION ML */
+
+
+/* BEGIN MODIFICATION RL */
+enum pert_type {He,DiValentino,DEDM, IntDM};
+ /* END MODIFICATION RL*/
 
 /**
  * All background parameters and evolution that other modules need to know.
@@ -148,6 +153,7 @@ struct background
   enum pert_type iDMDE_pert_type;
   short has_iDMDE;
   /* END MODIFICATION ML */
+  
 
   //@}
 
