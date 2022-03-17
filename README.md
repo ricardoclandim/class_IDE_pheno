@@ -1,7 +1,7 @@
 # Modification of CLASS (v2.9) for interacting DM-DE (phenomenological interaction)
 
 
-This is a modified version of CLASS, based in turn on the modified version by Matteo Lucca. It implements the interacting dark matter-dark energy model discussed in Costa et al 2016 (arXiv 1605.04138) with the addition of the perturbation of the Hubble parameter. The modifications with respect to the Lucca's (and original) version are in input.c, background.c and .h, and perturbations.c. The comments "BEGIN/END MODIFICATION RL" were added, where appropriate, to the previously modified version.
+This is a modified version of CLASS, based in turn on the modified version by Matteo Lucca. It implements the interacting dark matter-dark energy model discussed in Costa et al 2016 (arXiv 1605.04138) with the addition of the perturbation of the Hubble parameter. The modifications with respect to the Lucca's (and original) version are in input.c, background.c and .h, and perturbations.c. The comments "BEGIN/END MODIFICATION RL" were added, where appropriate, into the previously modified version.
 
 
 *****************************
