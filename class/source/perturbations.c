@@ -9118,8 +9118,8 @@ int perturb_derivs(double tau,
             //        Eq. (2.2d) of Murgia et al. 2016 (typo in first term)
             dy[pv->index_pt_theta_fld] = 2*a_prime_over_a*y[pv->index_pt_theta_fld]*(
                                                 1.
-                                                +pba->delta_Q/(1+w_fld)
-                                                +pba->delta_Q*(pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])/(1+w_fld)
+                                                +pba->delta_Q/(1+pba->w0_fld )
+                                                +pba->delta_Q*(pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])*1/(1+pba->w0_fld )/* there is a bug here. I had to replace w_fld in this term by pba-> w0_fld*/
                                                 )
                                         +k2/(1.+w_fld)*y[pv->index_pt_delta_fld];
           }
@@ -9129,9 +9129,9 @@ int perturb_derivs(double tau,
             //        Eq. (2.2d) of Murgia et al. 2016 (typo in first term)
             dy[pv->index_pt_theta_fld] = 2*a_prime_over_a*y[pv->index_pt_theta_fld]*(
                                                 1.
-                                                +pba->delta_Q*(pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld])/(1+w_fld)
+                                                +pba->delta_Q*pvecback[pba->index_bg_rho_cdm]/pvecback[pba->index_bg_rho_fld]*1/(1+pba->w0_fld ) /* there is a bug here. I had to replace w_fld in this term by pba-> w0_fld*/
                                                 )
-                                        +k2/(1.+w_fld)*y[pv->index_pt_delta_fld];
+                                        +k2/(1.+w_fld )*y[pv->index_pt_delta_fld];
           }
          }
          /* END MODIFICATION RL */  
