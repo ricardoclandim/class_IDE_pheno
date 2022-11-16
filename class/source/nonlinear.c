@@ -1651,7 +1651,10 @@ int nonlinear_free(
 
     free(pnl->k);
     free(pnl->ln_k);
-    free(pnl->ln_tau);
+    if (pnl->ln_tau_size>1) {
+      free(pnl->ln_tau);
+    }
+    //free(pnl->ln_tau); GAH
 
     for (index_pk=0; index_pk<pnl->pk_size; index_pk++) {
       free(pnl->ln_pk_ic_l[index_pk]);
