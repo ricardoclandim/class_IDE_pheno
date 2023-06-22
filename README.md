@@ -10,7 +10,7 @@ Installation instructions are found in the original CLASS code [wiki](https://gi
 
 This code can be freely used, as long as you cite the specific release paper ([Hoerning, Landim et al 2023](add)), the modified version ([Lucca & Hooper 2020](https://arxiv.org/abs/2002.06127)) and the original CLASS release paper ([Blas et al. 2011](https://arxiv.org/abs/1104.2933)).
 
-*****************************
+
 
 
 
