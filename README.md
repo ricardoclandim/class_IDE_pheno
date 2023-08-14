@@ -1,5 +1,5 @@
 
-[![](https://img.shields.io/badge/arXiv-2002.06127%20-red.svg)](https://arxiv.org/abs/2002.06127)
+[![](https://img.shields.io/badge/arXiv-2308.05807%20-red.svg)](https://arxiv.org/abs/2308.05807)
 
 # Modification of CLASS (v2.9) for interacting DM-DE (phenomenological interaction)
 
@@ -8,7 +8,7 @@ This is a modified version of [CLASS](https://github.com/lesgourg/class_public),
 
 Installation instructions are found in the original CLASS code [wiki](https://github.com/lesgourg/class_public/wiki/Installation).
 
-This code can be freely used, as long as you cite the specific release paper ([Hoerning, Landim et al 2023](add)), the modified version ([Lucca & Hooper 2020](https://arxiv.org/abs/2002.06127)) and the original CLASS release paper ([Blas et al. 2011](https://arxiv.org/abs/1104.2933)).
+This code can be freely used, as long as you cite the specific release paper ([Hoerning, Landim et al 2023](https://arxiv.org/abs/2308.05807)), the modified version ([Lucca & Hooper 2020](https://arxiv.org/abs/2002.06127)) and the original CLASS release paper ([Blas et al. 2011](https://arxiv.org/abs/1104.2933)).
 
 
 
